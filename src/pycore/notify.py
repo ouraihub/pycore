@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import os
 
-from pycore.http import post, HttpError
+from pycore.http import HttpError, post
 from pycore.log import logger
 
 log = logger("notify")

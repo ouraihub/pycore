@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 import asyncio
+from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
-from typing import Any, Callable, TypeVar
+from typing import Any, TypeVar
 
 from pycore.log import logger
 
@@ -89,7 +90,6 @@ async def run_async(
         results = asyncio.run(run_async({"a": fn_a, "b": fn_b}))
     """
     loop = asyncio.get_event_loop()
-    results: list[TaskResult] = []
 
     async def _run(key: str, fn: Callable[[], Any]) -> TaskResult:
         try:
@@ -112,7 +112,6 @@ async def gather_async(
         async def fetch(url): ...
         results = await gather_async({"a": fetch("http://a"), "b": fetch("http://b")})
     """
-    results: list[TaskResult] = []
 
     async def _wrap(key: str, coro: Any) -> TaskResult:
         try:
