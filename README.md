@@ -153,5 +153,5 @@ uv run ruff check src/
 
 ## 规范文档
 
-- [CONVENTIONS.md](./CONVENTIONS.md) — 日志规范 + 异常处理规范
-- [DESIGN.md](./DESIGN.md) — 架构设计
+- [CONVENTIONS.md](./docs/CONVENTIONS.md) — 日志规范 + 异常处理规范
+- [DESIGN.md](./docs/DESIGN.md) — 架构设计

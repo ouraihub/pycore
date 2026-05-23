@@ -116,5 +116,5 @@ tests/
 
 ## 规范文档
 
-- `CONVENTIONS.md` — 日志规则 + 异常处理规则（必读）
-- `DESIGN.md` — 架构设计 + 下游项目使用方式
+- `docs/CONVENTIONS.md` — 日志规则 + 异常处理规则（必读）
+- `docs/DESIGN.md` — 架构设计 + 下游项目使用方式
