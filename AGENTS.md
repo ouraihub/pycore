@@ -41,6 +41,45 @@ uv run ruff check src/ # lint
 - 用 dataclass 而不是 dict 传递结构化数据
 - 用 `|` 语法而不是 `Optional[]`（Python 3.11+）
 
+## 文件放置规范（严格遵守）
+
+**白名单制** — 只允许在以下位置创建/修改文件：
+
+| 路径 | 允许放什么 | 禁止 |
+|------|-----------|------|
+| `src/pycore/` | Python 模块（`.py`） | 子目录、非 Python 文件 |
+| `tests/` | 测试文件（`test_*.py`） | 子目录、fixture 数据文件 |
+| `docs/` | Markdown 文档 | 代码文件 |
+| 根目录 | 仅配置文件（见下方列表） | 新建任何其他文件 |
+
+**根目录允许的文件（完整列表，不得新增）：**
+
+```
+README.md
+AGENTS.md
+pyproject.toml
+uv.lock
+.gitignore
+.python-version
+```
+
+**绝对禁止：**
+
+- ❌ 在根目录创建新文件夹（`utils/`、`scripts/`、`lib/`、`examples/` 等）
+- ❌ 在 `src/pycore/` 下创建子目录（所有模块平铺为单文件）
+- ❌ 创建 `__pycache__`、`.venv`、`dist/` 等构建产物
+- ❌ 创建临时文件、scratch 文件、notebook 文件
+- ❌ 在 `tests/` 下创建子目录
+
+**如果需要新模块：**
+
+1. 在 `src/pycore/` 下创建 `xxx.py`（单文件，不超过 200 行）
+2. 如果逻辑超过 200 行，先讨论是否应该拆分，不要自行创建子目录
+
+**如果需要新文档：**
+
+1. 放在 `docs/` 下，Markdown 格式
+
 ## 修改代码时
 
 ### 新增模块
