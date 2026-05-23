@@ -67,15 +67,24 @@ class TestConfig:
 
 
 class TestLogger:
-    def test_structured_output(self, capsys) -> None:
-        log = logger("test_mod")
-        log.info("hello", key="value")
-        err = capsys.readouterr().err
-        data = json.loads(err)
-        assert data["level"] == "info"
-        assert data["msg"] == "hello"
-        assert data["module"] == "test_mod"
-        assert data["key"] == "value"
+    def test_structured_output(self) -> None:
+        import io
+        log = logger("test_mod2")
+        # Capture by adding a temporary handler
+        buf = io.StringIO()
+        handler = logging.StreamHandler(buf)
+        handler.setFormatter(logging.getLogger("pycore").handlers[0].formatter)
+        logging.getLogger("pycore").addHandler(handler)
+        try:
+            log.info("hello", key="value")
+            output = buf.getvalue()
+            data = json.loads(output.strip())
+            assert data["level"] == "info"
+            assert data["msg"] == "hello"
+            assert data["module"] == "test_mod2"
+            assert data["key"] == "value"
+        finally:
+            logging.getLogger("pycore").removeHandler(handler)
 
 from pycore.errors import AppError, ExternalServiceError, ValidationError
 
@@ -98,3 +107,62 @@ class TestErrors:
         e = ValidationError("x")
         assert isinstance(e, AppError)
         assert isinstance(e, Exception)
+
+import asyncio
+import time
+from pycore.concurrent import run_parallel, run_batch, run_async, gather_async, TaskResult
+
+
+class TestConcurrent:
+    def test_run_parallel(self) -> None:
+        results = run_parallel({
+            "a": lambda: "hello",
+            "b": lambda: 42,
+        })
+        assert len(results) == 2
+        values = {r.key: r.value for r in results}
+        assert values["a"] == "hello"
+        assert values["b"] == 42
+
+    def test_run_parallel_error(self) -> None:
+        def fail():
+            raise ValueError("boom")
+
+        results = run_parallel({"ok": lambda: 1, "bad": fail})
+        by_key = {r.key: r for r in results}
+        assert by_key["ok"].success is True
+        assert by_key["bad"].success is False
+        assert "boom" in by_key["bad"].error
+
+    def test_run_batch(self) -> None:
+        results = run_batch([1, 2, 3], lambda x: x * 2, label="double")
+        assert all(r.success for r in results)
+        assert sorted(r.value for r in results) == [2, 4, 6]
+
+    def test_run_parallel_actually_parallel(self) -> None:
+        def slow():
+            time.sleep(0.1)
+            return True
+
+        start = time.time()
+        results = run_parallel({f"t{i}": slow for i in range(5)}, max_workers=5)
+        elapsed = time.time() - start
+        assert elapsed < 0.3  # 5 tasks × 0.1s should finish in ~0.1s with 5 workers
+        assert all(r.success for r in results)
+
+    def test_run_async(self) -> None:
+        results = asyncio.run(run_async({"x": lambda: "async_val"}))
+        assert results[0].success is True
+        assert results[0].value == "async_val"
+
+    def test_gather_async(self) -> None:
+        async def double(n):
+            return n * 2
+
+        async def main():
+            return await gather_async({"a": double(3), "b": double(5)})
+
+        results = asyncio.run(main())
+        values = {r.key: r.value for r in results}
+        assert values["a"] == 6
+        assert values["b"] == 10
