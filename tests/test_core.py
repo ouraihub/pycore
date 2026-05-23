@@ -76,3 +76,25 @@ class TestLogger:
         assert data["msg"] == "hello"
         assert data["module"] == "test_mod"
         assert data["key"] == "value"
+
+from pycore.errors import AppError, ExternalServiceError, ValidationError
+
+
+class TestErrors:
+    def test_app_error_context(self) -> None:
+        e = ValidationError("bad input", field="email", value="xxx")
+        assert e.code == "VALIDATION_ERROR"
+        assert e.message == "bad input"
+        assert e.context == {"field": "email", "value": "xxx"}
+
+    def test_to_dict(self) -> None:
+        e = ExternalServiceError("API down", service="feishu", status=502)
+        d = e.to_dict()
+        assert d["code"] == "EXTERNAL_SERVICE_ERROR"
+        assert d["service"] == "feishu"
+        assert d["status"] == 502
+
+    def test_inheritance(self) -> None:
+        e = ValidationError("x")
+        assert isinstance(e, AppError)
+        assert isinstance(e, Exception)
