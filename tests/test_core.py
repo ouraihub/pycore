@@ -166,3 +166,53 @@ class TestConcurrent:
         values = {r.key: r.value for r in results}
         assert values["a"] == 6
         assert values["b"] == 10
+
+from pycore.retry import retry
+
+
+class TestRetry:
+    def test_succeeds_first_try(self) -> None:
+        call_count = 0
+
+        @retry(max_attempts=3, delay=0)
+        def succeed():
+            nonlocal call_count
+            call_count += 1
+            return "ok"
+
+        assert succeed() == "ok"
+        assert call_count == 1
+
+    def test_retries_then_succeeds(self) -> None:
+        call_count = 0
+
+        @retry(max_attempts=3, delay=0, exceptions=(ValueError,))
+        def flaky():
+            nonlocal call_count
+            call_count += 1
+            if call_count < 3:
+                raise ValueError("not yet")
+            return "done"
+
+        assert flaky() == "done"
+        assert call_count == 3
+
+    def test_exhausts_retries(self) -> None:
+        import pytest
+
+        @retry(max_attempts=2, delay=0, exceptions=(RuntimeError,))
+        def always_fail():
+            raise RuntimeError("boom")
+
+        with pytest.raises(RuntimeError, match="boom"):
+            always_fail()
+
+    def test_does_not_catch_other_exceptions(self) -> None:
+        import pytest
+
+        @retry(max_attempts=3, delay=0, exceptions=(ValueError,))
+        def wrong_error():
+            raise TypeError("wrong")
+
+        with pytest.raises(TypeError):
+            wrong_error()
