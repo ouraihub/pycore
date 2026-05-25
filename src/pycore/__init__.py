@@ -15,12 +15,14 @@ from pycore.errors import (
     ValidationError,
 )
 from pycore.log import logger
+from pycore.registry import Registry
 from pycore.result import Result, output_result
 
 __all__ = [
     "Result",
     "output_result",
     "logger",
+    "Registry",
     "env",
     "require_env",
     "load_dotenv",

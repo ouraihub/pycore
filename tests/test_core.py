@@ -216,3 +216,60 @@ class TestRetry:
 
         with pytest.raises(TypeError):
             wrong_error()
+
+from pycore.registry import Registry
+
+
+class TestRegistry:
+    def test_register_and_get(self) -> None:
+        r = Registry("test")
+
+        @r.register
+        class Foo:
+            name = "foo"
+
+        assert r.get("foo") is not None
+        assert r.get("foo").name == "foo"
+        assert r.get("bar") is None
+
+    def test_all_and_names(self) -> None:
+        r = Registry("test")
+
+        @r.register
+        class A:
+            name = "a"
+
+        @r.register
+        class B:
+            name = "b"
+
+        assert r.names() == ["a", "b"]
+        assert len(r.all()) == 2
+
+    def test_find(self) -> None:
+        r = Registry("test")
+
+        @r.register
+        class X:
+            name = "x"
+            val = 10
+
+        @r.register
+        class Y:
+            name = "y"
+            val = 20
+
+        found = r.find(lambda item: item.val == 20)
+        assert found is not None
+        assert found.name == "y"
+
+    def test_contains_and_len(self) -> None:
+        r = Registry("test")
+
+        @r.register
+        class Z:
+            name = "z"
+
+        assert "z" in r
+        assert "nope" not in r
+        assert len(r) == 1
