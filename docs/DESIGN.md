@@ -241,3 +241,28 @@ ignore = ["ANN101", "ANN102"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 ```
+
+---
+
+## 下游项目集成规划
+
+### msgflow（ohwiki/msgflow）
+
+| 步骤 | 状态 | 说明 |
+|------|------|------|
+| 分支 `feat/python-use-pycore` 已引入 pycore | ✅ 完成 | log/config/http/Result 已在用 |
+| 替换本地 `lib/registry.py` 为 `pycore.Registry` | ⏳ 待做 | 合并分支后执行 |
+| GitHub Actions workflow 适配 | ⏳ 待做 | `feishu-task.yml` 改用 `uv run python src/run_task.py` |
+| 删除 `python-legacy/` | ⏳ 待做 | 新版全部验证通过后 |
+
+### wucurcheck（augmentcodehub/wucurcheck）
+
+| 步骤 | 状态 | 说明 |
+|------|------|------|
+| 替换 `utils/logger.py` 为 `pycore.logger` | ⏳ 待做 | |
+| 替换 `utils/notify.py` 为 `pycore.notify` | ⏳ 待做 | |
+| 替换 `utils/config.py` 为 `pycore.config` | ⏳ 待做 | |
+
+### 未来新项目
+
+直接按 `docs/COMPONENTS.md` 的模板搭建，不再重复造轮子。
