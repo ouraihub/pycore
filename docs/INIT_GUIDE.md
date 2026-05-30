@@ -4,15 +4,14 @@
 
 ## 前置条件
 
-- pycore 已 clone 到本地：`/home/administrator/workspace/open-source/pycore`
 - 已安装 uv
+- 已安装 pycore：`uv tool install "pycore @ git+https://github.com/ouraihub/pycore.git"` 或本地 clone 后 `uv tool install -e .`
 
 ## 初始化步骤
 
 ```bash
 # 1. 创建项目
-cd /home/administrator/workspace/open-source
-uv run --directory /home/administrator/workspace/open-source/pycore pycore <项目名>
+pycore <项目名>
 
 # 2. 进入项目
 cd <项目名>
