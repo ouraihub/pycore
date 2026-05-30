@@ -19,8 +19,7 @@ def notify(message: str, *, channel: str | None = None) -> bool:
     elif channel == "feishu":
         return _send_feishu(message)
     else:
-        log.warning("No notify channel configured, printing to stdout")
-        print(f"[NOTIFY] {message}")
+        log.warning("No notify channel configured", channel=channel)
         return False
 
 

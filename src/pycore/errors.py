@@ -47,7 +47,7 @@ class ExternalServiceError(AppError):
         super().__init__(message, service=service, status=status, **context)
 
 
-class TimeoutError(AppError):
+class OperationTimeoutError(AppError):
     """Operation timed out."""
     code = "TIMEOUT"
 

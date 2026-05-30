@@ -10,10 +10,12 @@ from pycore.errors import (
     ConfigError,
     ExternalServiceError,
     NotFoundError,
+    OperationTimeoutError,
     RateLimitError,
-    TimeoutError,
     ValidationError,
 )
+# Backward compat alias
+TimeoutError = OperationTimeoutError
 from pycore.log import logger
 from pycore.registry import Registry
 from pycore.result import Result, output_result
