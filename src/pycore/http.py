@@ -66,9 +66,11 @@ def _request(
     retries: int = 0,
 ) -> Response:
     last_error: Exception | None = None
+    h = dict(headers or {})
+    h.setdefault("User-Agent", "Mozilla/5.0 (compatible; WucurBot/1.0)")
     for attempt in range(retries + 1):
         try:
-            req = urllib.request.Request(url, data=body, headers=headers or {}, method=method)
+            req = urllib.request.Request(url, data=body, headers=h, method=method)
             with urllib.request.urlopen(req, timeout=timeout) as resp:
                 return Response(
                     status=resp.status,
